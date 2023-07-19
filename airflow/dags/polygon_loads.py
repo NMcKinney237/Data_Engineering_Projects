@@ -1,20 +1,26 @@
-import airflow
+import airflow as af
 from airflow.operators.python import PythonOperator
+from airflow.utils.dates import days_ago
 from datetime import datetime
+import pandas as pd
+from airflow.providers.google.cloud.operators.bigquery import BigQueryOperator
 
-def get_most_recent_day(ticker):
+
+
+def get_aggregate_data(ticker, from_date, to_date, adjusted=True, limit=5000):
 
     rest_client = RESTClient(api_key="bt70lDEhuX6JBTu35vVU8Dbekd7pLWGt")
     get_aggregates = rest_client.get_aggs(
         ticker=ticker,
         multiplier=1,
         timespan="day",
-        from_=datetime.now().strftime("%Y-%m-%d"),
-        to=datetime.now().strftime("%Y-%m-%d"), 
-        adjusted=True,
+        from_=from_date,
+        to=to_date,
+        adjusted=adjusted,
         sort="asc",
-        limit=1,
+        limit=limit,
     )
+
 
     agg_data = []
     for agg in get_aggregates:
@@ -27,27 +33,37 @@ def get_most_recent_day(ticker):
     df = pd.DataFrame(data)
     df["ticker"] = ticker
 
+
     # Add a column for the date
     df["date"] = df["timestamp"].apply(lambda x: datetime.fromtimestamp(x / 1000))
 
     return df
 
-dag = airflow.DAG(
-    dag_id="pull_most_recent_day_data",
-    description="Pulls the most recent day of data for all tickers",
-    schedule_interval="@daily",
-)
 
-task_get_most_recent_day = PythonOperator(
-    task_id="get_most_recent_day_data",
-    python_callable=get_most_recent_day,
-    op_args=["AAPL"],
-)
+def load_data(df):
+    df.to_parquet(f"gs://my-bucket/polygon_techstocks_data/{df['date'].dt.strftime('%Y-%m-%d')}.parquet")
 
-dag.add_task(task_get_most_recent_day)
+    # Load the Parquet file to the warehouse
+    BigQueryOperator(
+        task_id="load_data",
+        src=f"gs://my-bucket/polygon_techstocks_data/{df['date'].dt.strftime('%Y-%m-%d')}.parquet",
+        destination="bigquery-public-data.polygon_techstocks_data",
+        table="polygon_techstocks_data",
+    )
 
 
- bigquery_client = bigquery.Client()
+with af.DAG(dag_id="initial_load", schedule_interval=None, start_date=days_ago(1)) as dag:
+    get_data = PythonOperator(
+        task_id="get_data",
+        python_callable=get_aggregate_data,
+        op_kwargs={
+            "tickers": ["NVDA", "AAPL", "GOOG", "AMZN", "MSFT", "INTC", "IBM", "FB", "TSM", "TSLA"],
+            "from_date": "2018-01-01",
+            "to_date": datetime.now().strftime("%Y-%m-%d"),
+        },
+    )
+
+    bigquery_client = bigquery.Client()
 
     load_data = PythonOperator(
         task_id="load_data",
