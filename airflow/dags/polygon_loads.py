@@ -3,7 +3,7 @@ from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 from datetime import datetime
 import pandas as pd
-from airflow.providers.google.cloud.operators.bigquery import BigQueryOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator # example code: https://registry.astronomer.io/dags/simple_bigquery/versions/1.4.0
 
 
 
@@ -44,6 +44,7 @@ def load_data(df):
     df.to_parquet(f"gs://my-bucket/polygon_techstocks_data/{df['date'].dt.strftime('%Y-%m-%d')}.parquet")
 
     # Load the Parquet file to the warehouse
+    # TODO: replace this with BigQueryInsertJobOperator
     BigQueryOperator(
         task_id="load_data",
         src=f"gs://my-bucket/polygon_techstocks_data/{df['date'].dt.strftime('%Y-%m-%d')}.parquet",
@@ -63,7 +64,8 @@ with af.DAG(dag_id="initial_load", schedule_interval=None, start_date=days_ago(1
         },
     )
 
-    bigquery_client = bigquery.Client()
+    # TODO: remove this as this doesn't exist anymore
+    # bigquery_client = bigquery.Client()
 
     load_data = PythonOperator(
         task_id="load_data",
@@ -95,3 +97,64 @@ with af.DAG(dag_id="incremental_load", schedule_interval="@daily", start_date=da
         "client": bigquery_client,
         "dataset_id": "cloud-warehouse-389415.jaffle_shop",
         "table_id": "polygon_techstocks_data",})
+    
+# TODO: your tasks should generally look like this given the latest bigquery api changes. The above will need to be removed or updated to work with the latest bigquery api
+
+    # """
+    # #### BigQuery dataset creation
+    # Create the dataset to store the sample data tables.
+    # """
+    # create_dataset = BigQueryCreateEmptyDatasetOperator(
+    #     task_id="create_dataset", dataset_id=DATASET
+    # )
+
+    # """
+    # #### BigQuery table creation
+    # Create the table to store sample forest fire data.
+    # """
+    # create_table = BigQueryCreateEmptyTableOperator(
+    #     task_id="create_table",
+    #     dataset_id=DATASET,
+    #     table_id=TABLE,
+    #     schema_fields=[
+    #         {"name": "id", "type": "INTEGER", "mode": "REQUIRED"},
+    #         {"name": "y", "type": "INTEGER", "mode": "NULLABLE"},
+    #         {"name": "month", "type": "STRING", "mode": "NULLABLE"},
+    #         {"name": "day", "type": "STRING", "mode": "NULLABLE"},
+    #         {"name": "ffmc", "type": "FLOAT", "mode": "NULLABLE"},
+    #         {"name": "dmc", "type": "FLOAT", "mode": "NULLABLE"},
+    #         {"name": "dc", "type": "FLOAT", "mode": "NULLABLE"},
+    #         {"name": "isi", "type": "FLOAT", "mode": "NULLABLE"},
+    #         {"name": "temp", "type": "FLOAT", "mode": "NULLABLE"},
+    #         {"name": "rh", "type": "FLOAT", "mode": "NULLABLE"},
+    #         {"name": "wind", "type": "FLOAT", "mode": "NULLABLE"},
+    #         {"name": "rain", "type": "FLOAT", "mode": "NULLABLE"},
+    #         {"name": "area", "type": "FLOAT", "mode": "NULLABLE"},
+    #     ],
+    # )
+
+    # """
+    # #### BigQuery table check
+    # Ensure that the table was created in BigQuery before inserting data.
+    # """
+    # check_table_exists = BigQueryTableExistenceSensor(
+    #     task_id="check_for_table",
+    #     project_id="{{ var.value.gcp_project_id }}",
+    #     dataset_id=DATASET,
+    #     table_id=TABLE,
+    # )
+
+    # """
+    # #### Insert data
+    # Insert data into the BigQuery table using an existing SQL query (stored in
+    # a file under dags/sql).
+    # """
+    # load_data = BigQueryInsertJobOperator(
+    #     task_id="insert_query",
+    #     configuration={
+    #         "query": {
+    #             "query": "{% include 'load_bigquery_forestfire_data.sql' %}",
+    #             "useLegacySql": False,
+    #         }
+    #     },
+    # )
