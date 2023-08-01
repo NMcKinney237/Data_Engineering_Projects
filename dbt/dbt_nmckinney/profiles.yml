@@ -1,6 +1,4 @@
-
-
-jaffle_shop:
+nmckinney_dev:
   outputs:
     dev:
       dataset: nmckinney_dev
