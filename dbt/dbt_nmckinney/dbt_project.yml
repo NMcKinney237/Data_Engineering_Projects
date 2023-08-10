@@ -21,6 +21,6 @@ require-dbt-version: [">=1.0.0", "<2.0.0"]
 
 models:
   nmckinney_dev:
-      materialized: table
-      stage:
-        materialized: view
+    polygon_stock_data:
+      materialized: view
+      schema: nmckinney_dev
