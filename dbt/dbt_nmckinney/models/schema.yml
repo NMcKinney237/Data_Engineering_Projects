@@ -6,12 +6,3 @@ sources:
     schema: nmckinney_dev
     tables:
       - name: polygon_stock_data
-
-models:
-  - name: polygon_stock_data
-    description: test_description
-
-
-
-
-  

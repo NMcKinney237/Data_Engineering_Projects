@@ -7,6 +7,3 @@ sources:
       - name: polygon_stock_data
       - name: stg_customers
       - name: stg_orders
-
-
-  

@@ -19,8 +19,3 @@ clean-targets:
 
 require-dbt-version: [">=1.0.0", "<2.0.0"]
 
-models:
-  nmckinney_dev:
-    polygon_stock_data:
-      materialized: view
-      schema: nmckinney_dev
