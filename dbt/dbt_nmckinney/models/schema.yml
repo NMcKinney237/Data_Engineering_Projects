@@ -3,6 +3,6 @@ version: 2
 sources:
   - name: nmckinney_dev
     database: cloud-warehouse-389415
-    schema: nmckinney_dev
+    schema: stripe
     tables:
       - name: polygon_stock_data

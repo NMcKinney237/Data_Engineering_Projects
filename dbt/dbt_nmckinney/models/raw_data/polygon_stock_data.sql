@@ -10,4 +10,4 @@ SELECT
     otc,
     ticker,
     date
-FROM {{ source('nmckinney_dev', 'polygon_stock_data') }}
+FROM {{ source('stripe', 'polygon_stock_data') }}
