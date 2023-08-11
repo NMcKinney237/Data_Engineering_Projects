@@ -1,3 +1,6 @@
+version: 2
+
+
 sources:
   - name: dbt_nmckinney
     dataset: cloud-warehouse-389415 #gcp project
