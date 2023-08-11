@@ -1,9 +1,6 @@
 sources:
   - name: dbt_nmckinney
     dataset: cloud-warehouse-389415 #gcp project
-    schema: nmckinney_dev 
+    schema: dbt_dev
     tables:
-      - name: customers
       - name: polygon_stock_data
-      - name: stg_customers
-      - name: stg_orders
