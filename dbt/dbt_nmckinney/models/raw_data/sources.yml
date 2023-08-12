@@ -1,0 +1,9 @@
+version: 2
+
+
+sources:
+  - name: dbt_nmckinney
+    project: cloud-warehouse-389415 #gcp project
+    dataset: dbt_dev
+    tables:
+      - name: polygon_stock_data

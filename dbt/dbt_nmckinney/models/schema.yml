@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: nmckinney_dev
+    database: cloud-warehouse-389415
+    schema: dbt_dev
+    tables:
+      - name: polygon_stock_data

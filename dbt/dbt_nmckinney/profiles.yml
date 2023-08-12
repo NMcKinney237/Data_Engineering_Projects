@@ -1,0 +1,14 @@
+nmckinney_dev:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: 'cloud-warehouse-389415'
+      dataset: dbt_dev
+      threads: 1  
+      keyfile: /Users/nathanmckinney/Desktop/Github/secret/keyfile.json
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      location: US
+      priority: interactive
