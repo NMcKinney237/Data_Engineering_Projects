@@ -10,4 +10,4 @@ SELECT
     otc,
     ticker,
     date
-FROM {{ source('dbt_dev', 'polygon_stock_data') }}
+FROM {{ source('dbt_nmckinney', 'polygon_stock_data') }}
