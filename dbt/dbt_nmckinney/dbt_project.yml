@@ -11,6 +11,18 @@ test-paths: ["tests"]
 analysis-paths: ["analysis"]
 macro-paths: ["macros"]
 
+# Custom Schema
+models:
+  dbt_nmckinney:
+    +schema: models
+    raw:
+      +schema: raw
+    staging:
+      +schema: stage
+    model:
+      +schema: model
+
+
 target-path: "target"
 clean-targets:
     - "target"
