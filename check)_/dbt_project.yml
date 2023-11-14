@@ -1,0 +1,30 @@
+name: 'snowflake_dbt'
+
+config-version: 2
+version: '1.0.0'
+
+profile: 'dbt_dev'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+analysis-paths: ["analysis"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets:
+    - "target"
+    - "dbt_modules"
+    - "logs"
+
+require-dbt-version: [">=1.0.0", "<2.0.0"]
+
+models:
+  snowflake_dbt:
+    +schema: models
+    raw:
+      +schema: raw
+    staging:
+      +schema: stage
+    model:
+      +schema: model
