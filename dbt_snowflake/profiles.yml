@@ -1,0 +1,13 @@
+dbt_dev:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: rm54292
+      user: "{{env_var('SNOWFLAKE_USER')}}"
+      password: "{{env_var('SNOWFLAKE_PASSWORD')}}"
+      role: dbt_user
+      database:  snowflake_prod
+      schema:  public
+      warehouse: xswh
+      threads: 3  

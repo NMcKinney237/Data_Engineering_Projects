@@ -1,4 +1,4 @@
-name: 'snowflake_dbt'
+name: 'dbt_snowflake'
 
 config-version: 2
 version: '1.0.0'
@@ -20,11 +20,9 @@ clean-targets:
 require-dbt-version: [">=1.0.0", "<2.0.0"]
 
 models:
-  snowflake_dbt:
+  dbt_dev:
     +schema: models
-    raw:
-      +schema: raw
     staging:
-      +schema: stage
+      +schema: dbt_stage
     model:
-      +schema: model
+      +schema: dbt_prod
